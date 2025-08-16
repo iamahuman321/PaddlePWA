@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Offline - Padel Management</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #6A26CD;
+      --accent-color: #FCD34D;
+      --light-bg-color: #F8F9FA;
+      --text-color: #1F2937;
+      --text-light: #6B7280;
+      --gradient-start: #6A26CD;
+      --gradient-end: #9254DE;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .offline-container {
+      max-width: 500px;
+      width: 100%;
+    }
+
+    .offline-icon {
+      font-size: 4rem;
+      margin-bottom: 2rem;
+      opacity: 0.8;
+    }
+
+    .offline-title {
+      font-size: 2.5rem;
+      font-weight: bold;
+      margin-bottom: 1rem;
+    }
+
+    .offline-message {
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+      opacity: 0.9;
+      line-height: 1.6;
+    }
+
+    .offline-features {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      backdrop-filter: blur(10px);
+    }
+
+    .offline-features h3 {
+      font-size: 1.3rem;
+      margin-bottom: 1rem;
+    }
+
+    .offline-features ul {
+      list-style: none;
+      text-align: left;
+    }
+
+    .offline-features li {
+      padding: 0.5rem 0;
+      display: flex;
+      align-items: center;
+    }
+
+    .offline-features li i {
+      margin-right: 0.75rem;
+      color: var(--accent-color);
+      width: 20px;
+    }
+
+    .retry-btn {
+      background: var(--accent-color);
+      color: var(--primary-color);
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(252, 211, 77, 0.3);
+    }
+
+    .retry-btn:hover {
+      background: #F59E0B;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(252, 211, 77, 0.4);
+    }
+
+    .network-status {
+      margin-top: 2rem;
+      padding: 1rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+
+    .network-status.online {
+      background: rgba(16, 185, 129, 0.2);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .network-status.offline {
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    @media (max-width: 768px) {
+      .offline-title {
+        font-size: 2rem;
+      }
+      
+      .offline-message {
+        font-size: 1rem;
+      }
+      
+      .offline-icon {
+        font-size: 3rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="offline-container">
+    <div class="offline-icon">
+      <i class="fas fa-wifi-slash"></i>
+    </div>
+    
+    <h1 class="offline-title">You're Offline</h1>
+    
+    <p class="offline-message">
+      Don't worry! Padel Management works offline too. Your tournaments and data are safely stored locally and will sync when you're back online.
+    </p>
+    
+    <div class="offline-features">
+      <h3><i class="fas fa-check-circle" style="color: var(--accent-color); margin-right: 0.5rem;"></i> Available Offline</h3>
+      <ul>
+        <li><i class="fas fa-trophy"></i> View existing tournaments</li>
+        <li><i class="fas fa-users"></i> Manage players</li>
+        <li><i class="fas fa-chart-bar"></i> Check statistics</li>
+        <li><i class="fas fa-edit"></i> Update match scores</li>
+        <li><i class="fas fa-plus"></i> Create new tournaments</li>
+        <li><i class="fas fa-sync-alt"></i> Auto-sync when reconnected</li>
+      </ul>
+    </div>
+    
+    <button class="retry-btn" onclick="retryConnection()">
+      <i class="fas fa-redo" style="margin-right: 0.5rem;"></i>
+      Try Again
+    </button>
+    
+    <div id="networkStatus" class="network-status offline">
+      <i class="fas fa-exclamation-triangle" style="margin-right: 0.5rem;"></i>
+      No internet connection detected
+    </div>
+  </div>
+
+  <script src="https://lib.youware.com/youware-lib-editor.1754557047.js" id="yourware-lib"></script><script>
+    // Network status monitoring
+    function updateNetworkStatus() {
+      const statusEl = document.getElementById('networkStatus');
+      const retryBtn = document.querySelector('.retry-btn');
+      
+      if (navigator.onLine) {
+        statusEl.className = 'network-status online';
+        statusEl.innerHTML = '<i class="fas fa-check-circle" style="margin-right: 0.5rem;"></i>Connection restored! Redirecting...';
+        
+        // Redirect to main app after a short delay
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 2000);
+      } else {
+        statusEl.className = 'network-status offline';
+        statusEl.innerHTML = '<i class="fas fa-exclamation-triangle" style="margin-right: 0.5rem;"></i>No internet connection detected';
+      }
+    }
+    
+    // Retry connection
+    function retryConnection() {
+      const btn = document.querySelector('.retry-btn');
+      const originalText = btn.innerHTML;
+      
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right: 0.5rem;"></i>Checking...';
+      btn.disabled = true;
+      
+      setTimeout(() => {
+        if (navigator.onLine) {
+          window.location.href = '/';
+        } else {
+          btn.innerHTML = originalText;
+          btn.disabled = false;
+          
+          // Show temporary message
+          const statusEl = document.getElementById('networkStatus');
+          const originalStatus = statusEl.innerHTML;
+          statusEl.innerHTML = '<i class="fas fa-times" style="margin-right: 0.5rem;"></i>Still offline. Please check your connection.';
+          
+          setTimeout(() => {
+            statusEl.innerHTML = originalStatus;
+          }, 3000);
+        }
+      }, 1500);
+    }
+    
+    // Listen for network changes
+    window.addEventListener('online', updateNetworkStatus);
+    window.addEventListener('offline', updateNetworkStatus);
+    
+    // Initial status check
+    updateNetworkStatus();
+    
+    // Auto-retry every 30 seconds
+    setInterval(() => {
+      if (navigator.onLine) {
+        updateNetworkStatus();
+      }
+    }, 30000);
+  </script>
+</body>
+</html>

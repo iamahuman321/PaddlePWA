@@ -1,0 +1,18 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://your-domain.com/sitemap.xml
+
+# Disallow sensitive files
+Disallow: /sw.js
+Disallow: /manifest.json
+Disallow: /.well-known/
+
+# Allow important PWA files
+Allow: /manifest.json
+Allow: /sw.js
+Allow: /offline.html
+
+# Cache policy
+Crawl-delay: 1

@@ -1,0 +1,213 @@
+{
+  "name": "Padel Tournament Manager",
+  "short_name": "PadelTM",
+  "id": "padel-tournament-manager-v1",
+  "description": "The ultimate padel tennis tournament organizer. Create tournaments, track scores, manage players, and share results instantly. Perfect for clubs, coaches, and padel enthusiasts.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone"],
+  "orientation": "portrait-primary",
+  "background_color": "#6A26CD",
+  "theme_color": "#6A26CD",
+  "lang": "en-US",
+  "dir": "ltr",
+  "categories": ["sports", "productivity", "utilities", "games"],
+  "iarc_rating_id": "e84b072d-71b3-4d3e-86ae-31a8ce4e53b7",
+  "prefer_related_applications": false,
+  "related_applications": [
+    {
+      "platform": "webapp",
+      "url": "https://v0-paddlemain2.vercel.app/manifest.json",
+      "id": "padel-tournament-manager-v1"
+    }
+  ],
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "protocol_handlers": [
+    {
+      "protocol": "web+padel",
+      "url": "/?tournament=%s"
+    }
+  ],
+  "file_handlers": [
+    {
+      "action": "/",
+      "accept": {
+        "application/json": [".json"],
+        "text/csv": [".csv"]
+      }
+    }
+  ],
+  "share_target": {
+    "action": "/share",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url",
+      "files": [
+        {
+          "name": "tournament_data",
+          "accept": ["application/json", "text/csv"]
+        }
+      ]
+    }
+  },
+  "handle_links": "preferred",
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
+  "scope_extensions": [
+    {
+      "origin": "https://v0-paddlemain2.vercel.app"
+    }
+  ],
+  "icons": [
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-192-maskable.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon-180.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-48.png",
+      "sizes": "48x48",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshot-mobile.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Tournament List View"
+    },
+    {
+      "src": "/screenshot-desktop.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Desktop Tournament Management"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "New Tournament",
+      "short_name": "New",
+      "description": "Create a new padel tournament",
+      "url": "/?action=new-tournament",
+      "icons": [
+        {
+          "src": "/shortcut-new.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Leaderboard",
+      "short_name": "Scores",
+      "description": "View tournament leaderboard",
+      "url": "/leaderboard.html",
+      "icons": [
+        {
+          "src": "/shortcut-leaderboard.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Players",
+      "short_name": "Players",
+      "description": "Manage players",
+      "url": "/?page=players",
+      "icons": [
+        {
+          "src": "/shortcut-players.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "widgets": [
+    {
+      "name": "tournament-widget",
+      "description": "Quick tournament overview",
+      "tag": "tournament-widget",
+      "template": "tournament-widget-template",
+      "ms_ac_template": "tournament-widget-template",
+      "data": "tournament-widget-data",
+      "type": "application/json",
+      "screenshots": [
+        {
+          "src": "/widget-screenshot.png",
+          "sizes": "320x160",
+          "label": "Tournament Status Widget"
+        }
+      ],
+      "auth": false,
+      "update": 86400
+    }
+  ]
+}

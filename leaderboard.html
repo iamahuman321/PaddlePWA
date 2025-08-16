@@ -1,0 +1,1372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Padel Management Leaderboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏓</text></svg>">
+  <style>
+    :root {
+      --primary-color: #6A26CD; /* Vibrant purple for headers */
+      --accent-color: #FCD34D; /* Yellow for buttons */
+      --light-bg-color: #F8F9FA;
+      --card-bg-color: #FFFFFF;
+      --border-color: #E5E7EB;
+      --text-color: #1F2937;
+      --text-light: #6B7280;
+      --success-color: #10B981;
+      --danger-color: #EF4444;
+      --gradient-start: #6A26CD;
+      --gradient-end: #9254DE;
+      --shadow-color: rgba(106, 38, 205, 0.15);
+      --winner-color: #10B981; /* Green for winner scores */
+      
+      /* Dark mode variables */
+      --dark-bg-color: #121212;
+      --dark-card-bg-color: #1E1E1E;
+      --dark-border-color: #2D2D2D;
+      --dark-text-color: #F0F0F0;
+      --dark-text-light: #CCCCCC;
+      --dark-header-color: #7E3AD7; /* Brighter purple for dark mode headers */
+      --dark-accent-color: #FFD54F; /* Brighter yellow for dark mode */
+      --dark-gradient-start: #4A148C;
+      --dark-gradient-end: #7E57C2;
+      --dark-shadow-color: rgba(126, 58, 215, 0.3);
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+    
+    body {
+      background-color: var(--light-bg-color);
+      color: var(--text-color);
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    body.dark-mode {
+      background-color: var(--dark-bg-color);
+      color: var(--dark-text-color);
+    }
+    
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+      color: white;
+      padding: 1.25rem;
+      text-align: center;
+      position: relative;
+    }
+    
+    body.dark-mode .header {
+      background: linear-gradient(135deg, var(--dark-gradient-start), var(--dark-gradient-end));
+    }
+    
+    /* Container */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 1rem;
+    }
+    
+    /* Card */
+    .card {
+      background-color: var(--card-bg-color);
+      border-radius: 24px;
+      box-shadow: 0 6px 16px var(--shadow-color);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      border: 1px solid var(--border-color);
+    }
+    
+    body.dark-mode .card {
+      background-color: var(--dark-card-bg-color);
+      border: 1px solid var(--dark-border-color);
+      box-shadow: 0 6px 16px var(--dark-shadow-color);
+    }
+    
+    /* Tournament header */
+    .tournament-meta-header {
+      margin-bottom: 1rem;
+      position: relative;
+    }
+    
+    .tournament-name {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: var(--primary-color);
+    }
+    
+    body.dark-mode .tournament-name {
+      color: var(--dark-header-color);
+    }
+    
+    .tournament-meta {
+      display: flex;
+      flex-wrap: wrap;
+      font-size: 0.9rem;
+      color: var(--text-light);
+      margin-bottom: 0.5rem;
+    }
+    
+    body.dark-mode .tournament-meta {
+      color: var(--dark-text-light);
+    }
+    
+    .tournament-meta-item {
+      display: flex;
+      align-items: center;
+      margin-right: 1rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .tournament-meta-item i {
+      margin-right: 5px;
+    }
+    
+    /* Leaderboard title */
+    .leaderboard-title {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--primary-color);
+    }
+    
+    .leaderboard-title i {
+      margin-right: 0.5rem;
+      color: var(--primary-color);
+    }
+    
+    body.dark-mode .leaderboard-title,
+    body.dark-mode .leaderboard-title i {
+      color: var(--dark-header-color);
+    }
+    
+    /* Leaderboard item */
+    .leaderboard-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 0;
+      margin-bottom: 0.25rem;
+    }
+    
+    /* Rank styles */
+    .rank {
+      font-weight: bold;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--primary-color);
+      color: white;
+      border-radius: 50%;
+      margin-right: 12px;
+      font-size: 0.9rem;
+    }
+    
+    body.dark-mode .rank {
+      background-color: var(--dark-header-color);
+    }
+    
+    /* Player info */
+    .player-info {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+    }
+    
+    .player-details {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .player-name {
+      font-weight: 500;
+      color: var(--text-color);
+      margin-bottom: 0.25rem;
+    }
+    
+    body.dark-mode .player-name {
+      color: var(--dark-text-color);
+    }
+    
+    .player-stats {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.75rem;
+      color: var(--text-light);
+    }
+    
+    body.dark-mode .player-stats {
+      color: var(--dark-text-light);
+    }
+    
+    .player-stat {
+      display: flex;
+      align-items: center;
+    }
+    
+    .player-stat-icon {
+      margin-right: 4px;
+    }
+    
+    /* Player score */
+    .player-score {
+      text-align: right;
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: var(--primary-color);
+    }
+    
+    body.dark-mode .player-score {
+      color: var(--dark-header-color);
+    }
+    
+    .score-label {
+      font-size: 0.7rem;
+      color: var(--text-light);
+      display: block;
+      text-transform: lowercase;
+    }
+    
+    body.dark-mode .score-label {
+      color: var(--dark-text-light);
+    }
+    
+    /* Round section */
+    .round-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: var(--text-color);
+    }
+    
+    body.dark-mode .round-title {
+      color: var(--dark-text-color);
+    }
+    
+    /* Rest card */
+    .rest-card {
+      border: 2px dashed #FFB74D;
+      border-radius: 16px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      background-color: rgba(255, 183, 77, 0.05);
+      text-align: center;
+      position: relative;
+    }
+    
+    body.dark-mode .rest-card {
+      background-color: rgba(255, 183, 77, 0.05);
+      border-color: #B45309;
+    }
+    
+    .rest-player {
+      font-weight: 600;
+      color: #B45309;
+      position: relative;
+      z-index: 1;
+    }
+    
+    body.dark-mode .rest-player {
+      color: #FFB74D;
+    }
+    
+    .rest-player i {
+      margin-right: 8px;
+      color: #F59E0B;
+    }
+    
+    .rest-bonus {
+      font-size: 0.85rem;
+      color: #92400E;
+      margin-top: 0.5rem;
+      background-color: rgba(255, 255, 255, 0.5);
+      padding: 0.5rem;
+      border-radius: 8px;
+      display: inline-block;
+      position: relative;
+      z-index: 1;
+    }
+    
+    body.dark-mode .rest-bonus {
+      color: #FFB74D;
+      background-color: rgba(0, 0, 0, 0.2);
+    }
+    
+    /* Match court indicator */
+    .court-indicator {
+      background-color: var(--primary-color);
+      color: white;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    
+    .court-indicator i {
+      margin-right: 5px;
+    }
+    
+    body.dark-mode .court-indicator {
+      background-color: var(--dark-header-color);
+    }
+    
+    /* Match styles */
+    .match-container {
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+    
+    .completed-badge {
+      background-color: #DCFCE7;
+      color: var(--success-color);
+      padding: 0.2rem 0.5rem;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 500;
+      position: absolute;
+      right: 0;
+      top: 0;
+    }
+    
+    body.dark-mode .completed-badge {
+      background-color: rgba(16, 185, 129, 0.2);
+    }
+    
+    /* Match card */
+    .match-card {
+      display: flex;
+      align-items: center;
+      position: relative;
+      padding-top: 2rem;
+    }
+    
+    /* Team columns */
+    .team-column {
+      flex: 1;
+      display: flex;
+      align-items: center;
+    }
+    
+    .team-column.left {
+      justify-content: flex-end;
+      text-align: right;
+      padding-right: 1rem;
+    }
+    
+    .team-column.right {
+      justify-content: flex-start;
+      text-align: left;
+      padding-left: 1rem;
+    }
+    
+    /* Team indicator bars */
+    .team-bar {
+      width: 4px;
+      height: 36px;
+      border-radius: 2px;
+    }
+    
+    .team-bar.team-a {
+      background-color: var(--primary-color);
+      margin-left: 0.75rem;
+    }
+    
+    .team-bar.team-b {
+      background-color: var(--accent-color);
+      margin-right: 0.75rem;
+    }
+    
+    /* Team info */
+    .team-info {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .team-label {
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 0.25rem;
+      color: var(--text-color);
+    }
+    
+    body.dark-mode .team-label {
+      color: var(--dark-text-color);
+    }
+    
+    .team-players {
+      font-size: 0.85rem;
+      color: var(--text-light);
+    }
+    
+    body.dark-mode .team-players {
+      color: var(--dark-text-light);
+    }
+    
+    /* Match score */
+    .score-column {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 0 1.5rem;
+    }
+    
+    .match-score {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+    
+    .score-winner {
+      color: var(--winner-color);
+    }
+    
+    .score-vs {
+      font-size: 0.9rem;
+      color: var(--text-light);
+      margin: 0 0.75rem;
+    }
+    
+    body.dark-mode .match-score {
+      color: var(--dark-header-color);
+    }
+    
+    body.dark-mode .score-winner {
+      color: var(--success-color);
+    }
+    
+    body.dark-mode .score-vs {
+      color: var(--dark-text-light);
+    }
+    
+    /* Toggle switch */
+    .toggle-switch {
+      display: flex;
+      align-items: center;
+      position: absolute;
+      top: 0;
+      right: 0;
+    }
+    
+    .toggle-label {
+      margin-right: 8px;
+      font-size: 0.85rem;
+      color: var(--text-light);
+    }
+    
+    body.dark-mode .toggle-label {
+      color: var(--dark-text-light);
+    }
+    
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 22px;
+    }
+    
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 22px;
+    }
+    
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    
+    input:checked + .slider {
+      background-color: var(--primary-color);
+    }
+    
+    input:focus + .slider {
+      box-shadow: 0 0 1px var(--primary-color);
+    }
+    
+    input:checked + .slider:before {
+      transform: translateX(22px);
+    }
+    
+    body.dark-mode input:checked + .slider {
+      background-color: var(--dark-header-color);
+    }
+    
+    /* Button styles */
+    .btn {
+      background-color: var(--accent-color);
+      color: var(--text-color);
+      border: none;
+      border-radius: 12px;
+      padding: 0.75rem 1.25rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      box-shadow: 0 2px 6px rgba(252, 211, 77, 0.3);
+    }
+    
+    .btn:hover {
+      background-color: #F59E0B;
+      box-shadow: 0 2px 8px rgba(252, 211, 77, 0.4);
+    }
+    
+    body.dark-mode .btn {
+      background-color: var(--dark-accent-color);
+      color: var(--dark-bg-color);
+      box-shadow: 0 2px 6px rgba(252, 211, 77, 0.2);
+    }
+    
+    body.dark-mode .btn:hover {
+      background-color: #F59E0B;
+      box-shadow: 0 2px 8px rgba(252, 211, 77, 0.3);
+    }
+    
+    .btn i {
+      margin-right: 6px;
+    }
+    
+    /* Loading and error states */
+    .loader {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 1rem;
+    }
+    
+    .spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      border-left-color: var(--primary-color);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin-bottom: 1rem;
+    }
+    
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+    
+    body.dark-mode .spinner {
+      border-color: rgba(255, 255, 255, 0.1);
+      border-left-color: var(--dark-header-color);
+    }
+    
+    .error {
+      background-color: rgba(239, 68, 68, 0.1);
+      border-left: 4px solid var(--danger-color);
+      padding: 1rem;
+      margin: 1rem 0;
+      border-radius: 6px;
+      color: var(--danger-color);
+    }
+    
+    body.dark-mode .error {
+      color: #FCA5A5;
+      border-left-color: #DC2626;
+    }
+    
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 1.5rem;
+      font-size: 0.85rem;
+      color: var(--text-light);
+      border-top: 1px solid var(--border-color);
+      margin-top: 2rem;
+    }
+    
+    body.dark-mode .footer {
+      color: var(--dark-text-light);
+      border-top-color: var(--dark-border-color);
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 640px) {
+      .toggle-switch {
+        position: static;
+        margin-top: 1rem;
+      }
+      
+      .match-card {
+        flex-direction: column;
+      }
+      
+      .team-column {
+        width: 100%;
+        margin-bottom: 0.5rem;
+        justify-content: flex-start;
+      }
+      
+      .team-column.left {
+        justify-content: flex-start;
+        text-align: left;
+        padding-right: 0;
+      }
+      
+      .score-column {
+        margin: 0.75rem 0;
+      }
+    }
+  </style>
+  <!-- PWA Meta Tags -->
+  <meta name="application-name" content="Padel Tournament Manager">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="PadelTM">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#6A26CD">
+  
+  <!-- Apple Touch Icon -->
+  <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgwIiBoZWlnaHQ9IjE4MCIgdmlld0JveD0iMCAwIDE4MCAxODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxODAiIGhlaWdodD0iMTgwIiByeD0iMjAiIGZpbGw9IiM2QTI2Q0QiLz4KPHBhdGggZD0iTTkwIDQ1QzEwOS4zIDQ1IDEyNSA2MC43IDEyNSA4MFMxMDkuMyAxMTUgOTAgMTE1UzU1IDk5LjMgNTUgODBTNzAuNyA0NSA5MCA0NVpNOTAgNTdDMTAzLjMgNTcgMTEzIDY2LjcgMTEzIDgwUzEwMy4zIDEwMyA5MCAxMDNTNjcgOTMuMyA2NyA4MFM3Ni43IDU3IDkwIDU3WiIgZmlsbD0iI0ZDRDM0RCIvPgo8cGF0aCBkPSJNNjggMTMwSDExMlYxNDJINjhWMTMwWiIgZmlsbD0iI0ZDRDM0RCIvPgo8cGF0aCBkPSJNNzggMTM1SDEwMlYxNDdINzhWMTM1WiIgZmlsbD0iI0ZGRkZGRiIvPgo8cGF0aCBkPSJNODUgMzNIOTVWNDVIODVWMzNaIiBmaWxsPSIjRkNEMzREIi8+Cjwvdmc+">
+  
+  <!-- Manifest -->
+  <link rel="manifest" href="/manifest.json">
+  
+  <!-- Preconnect -->
+  <link rel="preconnect" href="https://www.gstatic.com">
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+</head>
+<body>
+  <div class="header">
+    <h1>Padel Management Leaderboard</h1>
+  </div>
+  
+  <div class="container">
+    <div id="loading" class="loader">
+      <div class="spinner"></div>
+      <div>Loading tournament data...</div>
+    </div>
+    
+    <div id="errorContainer" class="error" style="display: none;"></div>
+    
+    <div id="tournamentContainer" style="display: none;">
+      <!-- Tournament Info Card -->
+      <div class="card">
+        <div class="tournament-meta-header">
+          <div class="tournament-name" id="tournamentName">Tournament Name</div>
+          <div class="tournament-meta">
+            <div class="tournament-meta-item">
+              <i class="fas fa-tag"></i>
+              <span id="tournamentType">Mexicano</span>
+            </div>
+            <div class="tournament-meta-item">
+              <i class="fas fa-users"></i>
+              <span id="playerCount">0</span> players
+            </div>
+            <div class="tournament-meta-item">
+              <i class="fas fa-calendar"></i>
+              <span id="tournamentDate">Date</span>
+            </div>
+          </div>
+          
+          <div class="toggle-switch">
+            <span class="toggle-label">Dark Mode</span>
+            <label class="switch">
+              <input type="checkbox" id="darkModeToggle">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+        
+        <!-- Leaderboard Section -->
+        <div class="leaderboard-title">
+          <i class="fas fa-trophy"></i> Leaderboard
+        </div>
+        
+        <div id="leaderboardList"></div>
+      </div>
+      
+      <!-- Rounds Section -->
+      <div id="roundsContainer"></div>
+      
+      <!-- App Link Button -->
+      <div style="text-align: center; margin-top: 1.5rem;">
+        <a href="#" id="viewOriginalBtn" class="btn">
+          <i class="fas fa-external-link-alt"></i> View in App
+        </a>
+      </div>
+      
+      <!-- Footer -->
+      <div class="footer">
+        Powered by Padel Management Tournament System<br>
+        <small>Live updating leaderboard</small>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Firebase App (the core Firebase SDK) -->
+  <script src="https://lib.youware.com/youware-lib-editor.1754557047.js" id="yourware-lib"></script><script src="https://lib.youware.com/youware-lib-consumer.1752562065.js" id="yourware-lib"></script><script src="https://lib.youware.com/youware-lib-consumer.1752562065.js" id="yourware-lib"></script><script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <!-- Firebase Realtime Database -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+
+  <script>
+    // Firebase configuration - same as the main app
+    const firebaseConfig = {
+      apiKey: "AIzaSyDymQBpzDKLOyMAiAHTY-lFcPGc2zuMgbg",
+      authDomain: "paddle-e3c7f.firebaseapp.com",
+      databaseURL: "https://paddle-e3c7f-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "paddle-e3c7f",
+      storageBucket: "paddle-e3c7f.firebasestorage.app",
+      messagingSenderId: "270747215285",
+      appId: "1:270747215285:web:9068d56bdafe6d21a7e5fc",
+      measurementId: "G-ZT3WBVF8M5"
+    };
+
+    // Tournament data and state
+    let tournamentData = null;
+    let firebaseDB = null;
+    let isRealTimeUpdateEnabled = true;
+    
+    // DOM elements
+    const loadingElement = document.getElementById('loading');
+    const errorContainer = document.getElementById('errorContainer');
+    const tournamentContainer = document.getElementById('tournamentContainer');
+    const leaderboardList = document.getElementById('leaderboardList');
+    const roundsContainer = document.getElementById('roundsContainer');
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const viewOriginalBtn = document.getElementById('viewOriginalBtn');
+    
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', function() {
+      // Parse URL parameters
+      const urlParams = new URLSearchParams(window.location.search);
+      const tournamentId = urlParams.get('id');
+      const shareData = urlParams.get('share');
+      
+      // Initialize Firebase
+      try {
+        firebase.initializeApp(firebaseConfig);
+        firebaseDB = firebase.database();
+        console.log("Firebase initialized successfully");
+      } catch (error) {
+        console.error("Firebase initialization error:", error);
+      }
+      
+      // Setup dark mode toggle
+      setupDarkMode();
+      
+      console.log("URL Parameters - tournamentId:", tournamentId, "shareData:", shareData ? "present" : "none");
+      
+      if (tournamentId) {
+        // Direct tournament ID - load from Firebase
+        console.log("Loading tournament by ID:", tournamentId);
+        loadTournamentById(tournamentId);
+      } else if (shareData) {
+        // Shared data via base64 - load directly
+        console.log("Loading shared tournament data");
+        loadSharedTournament(shareData);
+      } else {
+        // No tournament specified
+        showError("No tournament specified. Please provide a valid tournament ID or share data.");
+      }
+    });
+    
+    // Load tournament by ID (from Firebase)
+    function loadTournamentById(tournamentId) {
+      if (!firebaseDB) {
+        showError("Firebase is not available. Please try again later.");
+        return;
+      }
+      
+      const tournamentRef = firebaseDB.ref(`tournaments/${tournamentId}`);
+      
+      // First load to check if PDF export data is available in another tournament
+      // Try to load the PDF export data from a special location if it exists
+      const pdfExportRef = firebaseDB.ref(`tournamentExports/${tournamentId}`);
+      let originalPlayerData = null;
+      
+      pdfExportRef.once('value')
+        .then(snapshot => {
+          if (snapshot.exists()) {
+            console.log("Found PDF export data for tournament:", tournamentId);
+            const exportData = snapshot.val();
+            if (exportData && exportData.players) {
+              originalPlayerData = exportData.players;
+              console.log("Using player scores from PDF export data");
+            }
+          } else {
+            console.log("No PDF export data found, will use tournament data directly");
+          }
+          
+          // Setup real-time updates for the actual tournament data
+          setupTournamentRealTimeUpdates(tournamentRef, tournamentId, originalPlayerData);
+        })
+        .catch(error => {
+          console.error("Error checking for PDF export data:", error);
+          // Continue with tournament data if PDF export check fails
+          setupTournamentRealTimeUpdates(tournamentRef, tournamentId, null);
+        });
+    }
+    
+    // Setup real-time updates for tournament data
+    function setupTournamentRealTimeUpdates(tournamentRef, tournamentId, originalPlayerData) {
+      if (isRealTimeUpdateEnabled) {
+        tournamentRef.on('value', snapshot => {
+          if (snapshot.exists()) {
+            const data = snapshot.val();
+            // Ensure the tournament has the correct ID
+            data.id = tournamentId;
+            
+            // Apply PDF export scores if available
+            if (originalPlayerData && data.players) {
+              data.players = data.players.map(player => {
+                const exportPlayer = originalPlayerData.find(p => p.id === player.id);
+                if (exportPlayer) {
+                  return {
+                    ...player,
+                    score: exportPlayer.score,
+                    matchesWon: exportPlayer.matchesWon || player.matchesWon,
+                    matchesLost: exportPlayer.matchesLost || player.matchesLost,
+                    matchesTied: exportPlayer.matchesTied || player.matchesTied,
+                    pointsFor: exportPlayer.pointsFor || player.pointsFor,
+                    pointsAgainst: exportPlayer.pointsAgainst || player.pointsAgainst
+                  };
+                }
+                return player;
+              });
+            }
+            
+            tournamentData = data;
+            renderTournament(data);
+            
+            // Hide loading on first successful load
+            if (loadingElement.style.display !== 'none') {
+              loadingElement.style.display = 'none';
+              tournamentContainer.style.display = 'block';
+            }
+          } else {
+            showError("Tournament not found. It may have been deleted or you have an invalid link.");
+          }
+        }, error => {
+          console.error("Error loading tournament:", error);
+          showError("Failed to load tournament data. Please try again later.");
+        });
+      }
+    }
+    
+    // Setup real-time updates (kept for backwards compatibility but not used directly)
+    function setupRealTimeUpdates(tournamentId) {
+      if (!firebaseDB) return;
+      
+      const tournamentRef = firebaseDB.ref(`tournaments/${tournamentId}`);
+      
+      tournamentRef.on('value', snapshot => {
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          // Ensure the tournament has the correct ID
+          data.id = tournamentId;
+          tournamentData = data;
+          renderTournament(data);
+          console.log("Real-time update received for tournament:", tournamentId);
+        }
+      }, error => {
+        console.error("Error in real-time update:", error);
+      });
+    }
+    
+    // Load tournament from shared data (base64 encoded)
+    function loadSharedTournament(shareData) {
+      try {
+        // Decode and parse the shared data
+        const data = JSON.parse(atob(shareData));
+        
+        // Store the original player data which has the correct scores from PDF export
+        const originalPlayerData = data.players ? [...data.players] : [];
+        
+        tournamentData = data;
+        renderTournament(data);
+        
+        // Setup real-time updates if the tournament has an ID and Firebase is available
+        if (data.id && firebaseDB && isRealTimeUpdateEnabled) {
+          console.log("Setting up real-time updates for shared tournament:", data.id);
+          const tournamentRef = firebaseDB.ref(`tournaments/${data.id}`);
+          
+          // Use real-time listener to get latest data
+          tournamentRef.on('value', snapshot => {
+            if (snapshot.exists()) {
+              const liveData = snapshot.val();
+              
+              // Ensure the tournament has the correct ID
+              liveData.id = data.id;
+              
+              // Important: Preserve original player scores from the share data (PDF export)
+              // while getting updated match information
+              if (liveData.players && originalPlayerData.length > 0) {
+                liveData.players = liveData.players.map(livePlayer => {
+                  const originalPlayer = originalPlayerData.find(p => p.id === livePlayer.id);
+                  if (originalPlayer) {
+                    // Keep original scores but update other data
+                    return {
+                      ...livePlayer,
+                      score: originalPlayer.score,
+                      matchesWon: originalPlayer.matchesWon,
+                      matchesLost: originalPlayer.matchesLost,
+                      matchesTied: originalPlayer.matchesTied,
+                      pointsFor: originalPlayer.pointsFor,
+                      pointsAgainst: originalPlayer.pointsAgainst
+                    };
+                  }
+                  return livePlayer;
+                });
+              }
+              
+              tournamentData = liveData;
+              renderTournament(liveData);
+              console.log("Tournament data updated from Firebase (preserving original scores)");
+            }
+          }, error => {
+            console.error("Error in real-time update for shared tournament:", error);
+            // Continue with static data if Firebase fails
+          });
+        }
+      } catch (error) {
+        console.error("Error decoding shared data:", error);
+        showError("Invalid share data. The link may be corrupted or incomplete.");
+      }
+    }
+    
+    // Render the tournament data
+    function renderTournament(tournament) {
+      if (!tournament) return;
+      
+      // Update the view original button
+      const appUrl = window.location.origin + window.location.pathname.replace('leaderboard.html', 'index.html');
+      viewOriginalBtn.href = `${appUrl}?id=${tournament.id || ''}`;
+      
+      // Update tournament info
+      document.getElementById('tournamentName').textContent = tournament.name || 'Unnamed Tournament';
+      document.getElementById('tournamentType').textContent = tournament.type || 'Mexicano';
+      document.getElementById('playerCount').textContent = tournament.players ? tournament.players.length : 0;
+      document.getElementById('tournamentDate').textContent = tournament.createdAt ? new Date(tournament.createdAt).toLocaleDateString() : 'Unknown date';
+      
+      // Use the stats from data source if available (PDF export data),
+      // only calculate if necessary
+      const players = calculatePlayerStats(tournament.players, tournament.rounds);
+      
+      // Log player stats for debugging
+      console.log("Player scores:", players.map(p => `${p.name}: ${p.score}`).join(', '));
+      
+      // Render leaderboard
+      renderLeaderboard(players);
+      
+      // Render rounds
+      renderRounds(tournament);
+      
+      // Show the tournament container and hide loading
+      loadingElement.style.display = 'none';
+      tournamentContainer.style.display = 'block';
+    }
+    
+    // Render the leaderboard
+    function renderLeaderboard(players) {
+      if (!players) return;
+      
+      leaderboardList.innerHTML = '';
+      
+      // Sort players by score, preserving existing player order when scores are equal
+      const sortedPlayers = [...players].sort((a, b) => {
+        // Primary sort by score
+        if ((b.score || 0) !== (a.score || 0)) return (b.score || 0) - (a.score || 0);
+        
+        // Secondary sort by point differential
+        const aDiff = (a.pointsFor || 0) - (a.pointsAgainst || 0);
+        const bDiff = (b.pointsFor || 0) - (b.pointsAgainst || 0);
+        if (bDiff !== aDiff) return bDiff - aDiff;
+        
+        // Tertiary sort by points for
+        if ((b.pointsFor || 0) !== (a.pointsFor || 0)) return (b.pointsFor || 0) - (a.pointsFor || 0);
+        
+        // If all stats are equal, preserve original order based on index
+        const aIndex = players.findIndex(p => p.id === a.id);
+        const bIndex = players.findIndex(p => p.id === b.id);
+        return aIndex - bIndex;
+      });
+      
+      // Create leaderboard items
+      sortedPlayers.forEach((player, index) => {
+        const leaderboardItem = document.createElement('div');
+        leaderboardItem.className = 'leaderboard-item';
+        
+        const playerInfo = document.createElement('div');
+        playerInfo.className = 'player-info';
+        
+        const rank = document.createElement('div');
+        rank.className = 'rank';
+        rank.textContent = index + 1;
+        
+        const playerDetails = document.createElement('div');
+        playerDetails.className = 'player-details';
+        
+        const playerName = document.createElement('div');
+        playerName.className = 'player-name';
+        playerName.textContent = player.name;
+        
+        const playerStats = document.createElement('div');
+        playerStats.className = 'player-stats';
+        
+        const matchesStat = document.createElement('div');
+        matchesStat.className = 'player-stat';
+        matchesStat.innerHTML = `<i class="fas fa-gamepad player-stat-icon"></i> ${player.matchesPlayed || 0} matches`;
+        
+        // Create W-L record display
+        const recordStat = document.createElement('div');
+        recordStat.className = 'player-stat';
+        recordStat.innerHTML = `<i class="fas fa-chart-line player-stat-icon"></i> ${player.matchesWon || 0}W-${player.matchesLost || 0}L`;
+        
+        // Create point differential display
+        const pointDiff = (player.pointsFor || 0) - (player.pointsAgainst || 0);
+        const diffPrefix = pointDiff >= 0 ? '+' : '';
+        const pointDiffStat = document.createElement('div');
+        pointDiffStat.className = 'player-stat';
+        pointDiffStat.innerHTML = `<i class="fas fa-balance-scale player-stat-icon"></i> ${diffPrefix}${pointDiff}`;
+        
+        playerStats.appendChild(matchesStat);
+        playerStats.appendChild(recordStat);
+        playerStats.appendChild(pointDiffStat);
+        
+        playerDetails.appendChild(playerName);
+        playerDetails.appendChild(playerStats);
+        
+        playerInfo.appendChild(rank);
+        playerInfo.appendChild(playerDetails);
+        
+        const scoreDiv = document.createElement('div');
+        scoreDiv.className = 'player-score';
+        scoreDiv.innerHTML = `
+          ${player.score || 0}
+          <span class="score-label">points</span>
+        `;
+        
+        leaderboardItem.appendChild(playerInfo);
+        leaderboardItem.appendChild(scoreDiv);
+        
+        leaderboardList.appendChild(leaderboardItem);
+      });
+    }
+    
+    // Render tournament rounds
+    function renderRounds(tournament) {
+      if (!tournament || !tournament.rounds) return;
+      
+      roundsContainer.innerHTML = '';
+      
+      tournament.rounds.forEach((round, roundIndex) => {
+        const roundCard = document.createElement('div');
+        roundCard.className = 'card';
+        
+        const roundTitle = document.createElement('div');
+        roundTitle.className = 'round-title';
+        roundTitle.textContent = `Round ${roundIndex + 1}`;
+        
+        roundCard.appendChild(roundTitle);
+        
+        // Show resting players
+        if (round.restingPlayers && round.restingPlayers.length > 0) {
+          const restCard = document.createElement('div');
+          restCard.className = 'rest-card';
+          
+          const restingPlayerNames = round.restingPlayers.map(playerId => 
+            tournament.players.find(p => p.id === playerId)?.name || 'Unknown'
+          );
+          
+          restCard.innerHTML = `
+            <div class="rest-player">
+              <i class="fas fa-chair"></i> Resting: ${restingPlayerNames.join(', ')}
+            </div>
+            <div class="rest-bonus">+10 bonus points per rest</div>
+          `;
+          
+          roundCard.appendChild(restCard);
+        }
+        
+        // Show matches
+        round.matches.forEach((match, matchIndex) => {
+          const matchContainer = document.createElement('div');
+          matchContainer.className = 'match-container';
+          
+          const courtIndicator = document.createElement('div');
+          courtIndicator.className = 'court-indicator';
+          courtIndicator.innerHTML = `<i class="fas fa-table-tennis"></i> Court ${match.courtNumber}`;
+          
+          const completedBadge = document.createElement('div');
+          completedBadge.className = 'completed-badge';
+          completedBadge.textContent = 'Completed';
+          
+          // Team A info
+          const teamAPlayers = match.teamA.map(playerId => 
+            tournament.players.find(p => p.id === playerId)?.name || 'Unknown'
+          ).join(' & ');
+          
+          // Team B info
+          const teamBPlayers = match.teamB.map(playerId => 
+            tournament.players.find(p => p.id === playerId)?.name || 'Unknown'
+          ).join(' & ');
+          
+          // Score info
+          const isTeamAWinner = match.scoreA > match.scoreB;
+          const isTeamBWinner = match.scoreB > match.scoreA;
+          
+          // Create match card
+          const matchCard = document.createElement('div');
+          matchCard.className = 'match-card';
+          
+          // Team A column
+          const teamAColumn = document.createElement('div');
+          teamAColumn.className = 'team-column left';
+          
+          const teamAInfo = document.createElement('div');
+          teamAInfo.className = 'team-info';
+          
+          const teamALabel = document.createElement('div');
+          teamALabel.className = 'team-label';
+          teamALabel.textContent = 'Team A';
+          
+          const teamAPlayersEl = document.createElement('div');
+          teamAPlayersEl.className = 'team-players';
+          teamAPlayersEl.textContent = teamAPlayers;
+          
+          teamAInfo.appendChild(teamALabel);
+          teamAInfo.appendChild(teamAPlayersEl);
+          
+          const teamABar = document.createElement('div');
+          teamABar.className = 'team-bar team-a';
+          
+          teamAColumn.appendChild(teamAInfo);
+          teamAColumn.appendChild(teamABar);
+          
+          // Score column
+          const scoreColumn = document.createElement('div');
+          scoreColumn.className = 'score-column';
+          
+          const scoreA = document.createElement('div');
+          scoreA.className = `match-score ${isTeamAWinner ? 'score-winner' : ''}`;
+          scoreA.textContent = match.scoreA;
+          
+          const scoreVs = document.createElement('div');
+          scoreVs.className = 'score-vs';
+          scoreVs.textContent = 'vs';
+          
+          const scoreB = document.createElement('div');
+          scoreB.className = `match-score ${isTeamBWinner ? 'score-winner' : ''}`;
+          scoreB.textContent = match.scoreB;
+          
+          scoreColumn.appendChild(scoreA);
+          scoreColumn.appendChild(scoreVs);
+          scoreColumn.appendChild(scoreB);
+          
+          // Team B column
+          const teamBColumn = document.createElement('div');
+          teamBColumn.className = 'team-column right';
+          
+          const teamBBar = document.createElement('div');
+          teamBBar.className = 'team-bar team-b';
+          
+          const teamBInfo = document.createElement('div');
+          teamBInfo.className = 'team-info';
+          
+          const teamBLabel = document.createElement('div');
+          teamBLabel.className = 'team-label';
+          teamBLabel.textContent = 'Team B';
+          
+          const teamBPlayersEl = document.createElement('div');
+          teamBPlayersEl.className = 'team-players';
+          teamBPlayersEl.textContent = teamBPlayers;
+          
+          teamBInfo.appendChild(teamBLabel);
+          teamBInfo.appendChild(teamBPlayersEl);
+          
+          teamBColumn.appendChild(teamBBar);
+          teamBColumn.appendChild(teamBInfo);
+          
+          // Assemble match card
+          matchCard.appendChild(teamAColumn);
+          matchCard.appendChild(scoreColumn);
+          matchCard.appendChild(teamBColumn);
+          
+          // Add everything to match container
+          matchContainer.appendChild(courtIndicator);
+          matchContainer.appendChild(completedBadge);
+          matchContainer.appendChild(matchCard);
+          
+          roundCard.appendChild(matchContainer);
+        });
+        
+        roundsContainer.appendChild(roundCard);
+      });
+    }
+    
+    // Show error message
+    function showError(message) {
+      loadingElement.style.display = 'none';
+      errorContainer.style.display = 'block';
+      errorContainer.textContent = message;
+    }
+    
+    // Setup dark mode toggle
+    function setupDarkMode() {
+      // Check for saved preference
+      const isDarkMode = localStorage.getItem('darkMode') === 'true';
+      
+      // Apply saved preference
+      if (isDarkMode) {
+        document.body.classList.add('dark-mode');
+        darkModeToggle.checked = true;
+      }
+      
+      // Add toggle event listener
+      darkModeToggle.addEventListener('change', function() {
+        document.body.classList.toggle('dark-mode');
+        localStorage.setItem('darkMode', this.checked);
+      });
+    }
+    
+    // Handle player stats - prioritize existing data, only calculate as fallback
+    function calculatePlayerStats(players, rounds) {
+      if (!players || !rounds) return players;
+      
+      // Clone players to avoid modifying the original array
+      const updatedPlayers = JSON.parse(JSON.stringify(players));
+      
+      // Check if players already have complete stats
+      const hasCompleteStats = updatedPlayers.every(player => 
+        player.score !== undefined && 
+        player.matchesPlayed !== undefined && 
+        player.matchesWon !== undefined && 
+        player.matchesLost !== undefined &&
+        player.pointsFor !== undefined &&
+        player.pointsAgainst !== undefined
+      );
+      
+      // If players already have complete stats, don't recalculate
+      if (hasCompleteStats) {
+        console.log("Using existing player stats from data source");
+        return updatedPlayers;
+      }
+      
+      console.log("Player stats incomplete, calculating from match data");
+      
+      // Reset stats for all players
+      updatedPlayers.forEach(player => {
+        player.score = 0;
+        player.matchesPlayed = 0;
+        player.matchesWon = 0;
+        player.matchesLost = 0;
+        player.matchesTied = 0;
+        player.pointsFor = 0;
+        player.pointsAgainst = 0;
+        player.restsCount = 0;
+      });
+      
+      // Process rounds
+      rounds.forEach(round => {
+        // Process matches
+        if (round.matches && Array.isArray(round.matches)) {
+          round.matches.forEach(match => {
+            if (!match.completed) return;
+            
+            // Process team A
+            match.teamA.forEach(playerId => {
+              const player = updatedPlayers.find(p => p.id === playerId);
+              if (!player) return;
+              
+              player.matchesPlayed++;
+              player.pointsFor += match.scoreA;
+              player.pointsAgainst += match.scoreB;
+              
+              if (match.scoreA > match.scoreB) {
+                player.matchesWon++;
+                player.score += 3; // Win = 3 points
+              } else if (match.scoreA < match.scoreB) {
+                player.matchesLost++;
+                player.score += 1; // Loss = 1 point
+              } else {
+                player.matchesTied++;
+                player.score += 2; // Tie = 2 points
+              }
+            });
+            
+            // Process team B
+            match.teamB.forEach(playerId => {
+              const player = updatedPlayers.find(p => p.id === playerId);
+              if (!player) return;
+              
+              player.matchesPlayed++;
+              player.pointsFor += match.scoreB;
+              player.pointsAgainst += match.scoreA;
+              
+              if (match.scoreB > match.scoreA) {
+                player.matchesWon++;
+                player.score += 3; // Win = 3 points
+              } else if (match.scoreB < match.scoreA) {
+                player.matchesLost++;
+                player.score += 1; // Loss = 1 point
+              } else {
+                player.matchesTied++;
+                player.score += 2; // Tie = 2 points
+              }
+            });
+          });
+        }
+        
+        // Process resting players
+        if (round.restingPlayers) {
+          round.restingPlayers.forEach(playerId => {
+            const player = updatedPlayers.find(p => p.id === playerId);
+            if (!player) return;
+            
+            player.restsCount = (player.restsCount || 0) + 1;
+            player.score += 10; // Rest bonus = 10 points
+          });
+        }
+      });
+      
+      return updatedPlayers;
+    }
+  </script>
+</body>
+</html>
